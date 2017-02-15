@@ -25,9 +25,6 @@ int main (int argc, char* argv[])
             ("f", options::value<string>()->default_value("MD_Every10ps.xtc"), "Traj file (.xtc)")
             ("s", options::value<string>()->default_value("MD.gro"), "Structure file (.gro)")
             ("d", options::value<float>()->default_value(0.10f), "Delta grid in nm")
-            ("x", options::value<float>()->default_value(( -47.669765+43.826443 )/10.0f), "x offset in nm")
-            ("y", options::value<float>()->default_value(( -27.729836+23.951584 )/10.0f), "y offset in nm")
-            ("z", options::value<float>()->default_value(( -67.089615+63.277534 )/10.0f), "z offset in nm")
             ;
 
     options::variables_map args;
@@ -45,11 +42,6 @@ int main (int argc, char* argv[])
 
 
     const float deltaGrid {args["d"].as<float>()};
-
-    const float xOffset { args["x"].as<float>() };
-    const float yOffset { args["y"].as<float>() };
-    const float zOffset { args["z"].as<float>() };
-
 
     typedef map<float, map<float, map<float, float>>> grid_type;
 
@@ -168,9 +160,9 @@ int main (int argc, char* argv[])
                 const float y = positions[index][1];
                 const float z = positions[index][2];
 
-                grid[floor((x+xOffset-minX)/deltaGrid+0.5)]
-                    [floor((y+yOffset-minY)/deltaGrid+0.5)]
-                    [floor((z+zOffset-minZ)/deltaGrid+0.5)] += 1.0f;
+                grid[floor((x-minX)/deltaGrid+0.5)]
+                    [floor((y-minY)/deltaGrid+0.5)]
+                    [floor((z-minZ)/deltaGrid+0.5)] += 1.0f;
             }
         }
     }
@@ -212,7 +204,7 @@ int main (int argc, char* argv[])
     {
         densityCubeFile << " CPMD CUBE FILE." << endl;
         densityCubeFile << " OUTER LOOP: X, MIDDLE LOOP: Y, INNER LOOP: Z" << endl;
-        densityCubeFile << groParser.nSolutes() << " " << minX+xOffset << " " << minY+yOffset << " " << minZ+zOffset << endl;
+        densityCubeFile << groParser.nSolutes() << " " << minX << " " << minY << " " << minZ << endl;
 
         densityCubeFile << nXGrid << " " << deltaGrid*nmToBohr << " 0.0 0.0" << endl;
         densityCubeFile << nYGrid << " 0.0 " << deltaGrid*nmToBohr << " 0.0" << endl;
@@ -223,7 +215,7 @@ int main (int argc, char* argv[])
         {
             const Coordinate coordinate = groParser.getCoordinateForSolute(index);
             const string type = groParser.getTypeForSolute(index);
-            densityCubeFile << nameToZ[groParser.getTypeForSolute(index)] << " 0.0 " << (coordinate.x+xOffset)*nmToBohr << " " << (coordinate.y+yOffset)*nmToBohr << " " << (coordinate.z+zOffset)*nmToBohr << endl;
+            densityCubeFile << nameToZ[groParser.getTypeForSolute(index)] << " 0.0 " << (coordinate.x)*nmToBohr << " " << (coordinate.y)*nmToBohr << " " << (coordinate.z)*nmToBohr << endl;
         }
 
         for(int nx=0; nx<nXGrid; nx++) {
