@@ -1,6 +1,6 @@
 # MDFTRef
 
-** Compilation
+* Compilation
 ```
 mkdir build
 cd build
@@ -9,7 +9,7 @@ make
 
 ```
 
-** Running
+* Running
 
 Example:
 ```
